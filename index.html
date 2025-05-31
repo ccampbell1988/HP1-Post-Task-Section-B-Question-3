@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Hockey Player Evaluation Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        Report Info: Tryout Phases (Section 1) -> Goal: Organize a multi-step process clearly. -> Viz/Presentation Method: Vertical stepper/timeline with cards made with HTML/Tailwind. -> Interaction: Static visual flow. -> Justification: Provides a clear, sequential overview of the selection process, enhancing understanding of the workflow. -> Library/Method: HTML/Tailwind.
+        Report Info: Evaluation Tools (Section 2) -> Goal: Compare and categorize various tools. -> Viz/Presentation Method: Two-column layout for On-Ice/Off-Ice tools using HTML/Tailwind lists. -> Interaction: Static lists. -> Justification: Simple, direct presentation for easy comparison and reference. -> Library/Method: HTML/Tailwind.
+        Report Info: In-Season Evaluation Plan (Section 3) -> Goal: Organize detailed methods for four distinct pillars. -> Viz/Presentation Method: Tabbed interface for Technical, Tactical, Physical, Mental. -> Interaction: User clicks tabs to view content for each pillar. -> Justification: Reduces cognitive load by allowing users to focus on one area at a time. -> Library/Method: Vanilla JS for tab functionality, HTML/Tailwind for content.
+        Report Info: In-Season Tracking Tools (Section 4) - specifically the 'Self-Evaluation Radar' concept -> Goal: Inform and compare player profiles dynamically. -> Viz/Presentation Method: Interactive Radar Chart. -> Interaction: User selects a player profile from a dropdown, chart updates dynamically. -> Justification: Transforms a static concept into an engaging, personalized tool for assessing player attributes across multiple dimensions. -> Library/Method: Chart.js (Canvas).
+        Report Info: Other Tracking Tools (Section 4) -> Goal: Inform about diverse tracking methods. -> Viz/Presentation Method: Grouped lists under pillars. -> Interaction: Static lists. -> Justification: Provides a quick overview of available methods. -> Library/Method: HTML/Tailwind.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visual structures are HTML/CSS/Tailwind or Chart.js Canvas.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFDFD; color: #1E293B; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 380px; max-height: 450px; }
+        @media (min-width: 768px) { .chart-container { height: 450px; max-height: 500px; } }
+        .nav-link { padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.3s ease, color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { background-color: #3E8E7E; color: white; }
+        .tab-button { padding: 0.75rem 1.5rem; font-medium: text-slate-600; border-bottom: 2px solid transparent; transition: all 0.3s ease; }
+        .tab-button.active { color: #3E8E7E; border-bottom-color: #3E8E7E; }
+        .custom-list > li { margin-bottom: 0.5rem; padding-left: 0.5rem; }
+        .custom-list > li::before { content: "▹"; margin-right: 0.5rem; color: #3E8E7E; font-weight: bold; }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-[#0A2463] text-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-lg sm:text-xl font-bold">Section B: The Art of Coaching Competencies: Question 3</div>
+                <div class="hidden md:flex items-center space-x-2">
+                    <a href="#selection-process" class="nav-link">Selection</a>
+                    <a href="#evaluation-tools" class="nav-link">Tools</a>
+                    <a href="#in-season-plan" class="nav-link">In-Season</a>
+                    <a href="#progress-tracking" class="nav-link">Tracking</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>        
+        <div id="mobile-menu" class="md:hidden hidden bg-[#0A2463] pb-3">
+            <a href="#selection-process" class="block text-white hover:bg-[#3E8E7E] px-4 py-2">Selection Process</a>
+            <a href="#evaluation-tools" class="block text-white hover:bg-[#3E8E7E] px-4 py-2">Evaluation Tools</a>
+            <a href="#in-season-plan" class="block text-white hover:bg-[#3E8E7E] px-4 py-2">In-Season Plan</a>
+            <a href="#progress-tracking" class="block text-white hover:bg-[#3E8E7E] px-4 py-2">Progress Tracking</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 md:p-8">
+
+        <section id="selection-process" class="py-10 md:py-16 scroll-mt-20">
+            <h2 class="text-3xl sm:text-4xl font-bold text-[#0A2463] mb-4 text-center">Team Selection & Tryout Process</h2>
+            <p class="text-center text-slate-700 text-base md:text-lg max-w-3xl mx-auto mb-12">The team selection and tryout process is a critical phase designed to identify and select players who not only possess the necessary skills but also align with the team's identity, culture, and long-term development goals. This process should be transparent, fair, and comprehensive, built upon core principles like Long-Term Player Development (LTPD), a player-centered approach, holistic evaluation (Talent, Character, Competitiveness, Expectations), and clear communication.</p>
+            <div class="max-w-3xl mx-auto">
+                <div class="space-y-8">
+                    <div class="phase-item relative flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-[#3E8E7E] text-white flex items-center justify-center text-xl font-semibold z-10 shadow">1</div>
+                        <div class="ml-6 sm:ml-8 flex-grow phase-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-200">
+                            <h3 class="text-xl font-semibold text-[#0A2463] mb-2">Phase 1: Pre-Tryout Identification & Preparation</h3>
+                            <div class="text-slate-700 text-sm">
+                                <p class="mb-2">This foundational phase occurs before any player steps on the ice. It involves:</p>
+                                <ul class="space-y-1 text-sm custom-list">
+                                    <li><strong class="text-[#3E8E7E]">Scouting & Information Gathering:</strong> For higher levels, this involves scouting previous season's games, and gathering information from previous coaches (respecting privacy and ethical guidelines).</li>
+                                    <li><strong class="text-[#3E8E7E]">Defining Team Needs & Identity:</strong> Clearly outline the desired player attributes based on the "Team Canada Identity" (e.g., Creative & Dynamic, High Compete Level, Manages Pucks, Hard to Play Against) and the specific needs of the team for the upcoming season.</li>
+                                    <li><strong class="text-[#3E8E7E]">Establishing Evaluation Criteria:</strong> Develop a clear, objective set of criteria based on the four pillars (Technical, Tactical, Physical, Mental) and the team's identity. This should align with Hockey Canada's skill assessment guidelines.</li>
+                                    <li><strong class="text-[#3E8E7E]">Staff Preparation:</strong> Ensure all evaluators understand the criteria, their roles, and the evaluation tools to be used. Consistency in evaluation is key.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="phase-item relative flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-[#3E8E7E] text-white flex items-center justify-center text-xl font-semibold z-10 shadow">2</div>
+                        <div class="ml-6 sm:ml-8 flex-grow phase-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-200">
+                            <h3 class="text-xl font-semibold text-[#0A2463] mb-2">Phase 2: Initial On-Ice Evaluation (Camp Days 1-2)</h3>
+                            <div class="text-slate-700 text-sm">
+                                <p class="mb-2">The first two days of camp focus on assessing core abilities:</p>
+                                <ul class="space-y-1 text-sm custom-list">
+                                    <li><strong class="text-[#3E8E7E]">Skill-Based Drills:</strong> Utilize drills from Hockey Canada's Player Assessment plans (e.g., Skating Agility Combinations, Puck Control Drills, Shooting Sequences, 1v1s). Focus on assessing fundamental skills: skating, puck handling, passing, shooting, and defensive skills. Standardized drill sheets with clear evaluation points are used.</li>
+                                    <li><strong class="text-[#3E8E7E]">Small Area Games (SAGs):</strong> Excellent for evaluating hockey sense, decision-making under pressure, competitiveness, and skill application in tight spaces. Observe "Puck Pursuit," "Winning Battles and Races," and "Managing Pucks." Observation checklists are key.</li>
+                                    <li><strong class="text-[#3E8E7E]">Initial Goaltender Evaluation:</strong> Specific drills focusing on positioning, rebound control, save selection, and puck handling.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="phase-item relative flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-[#3E8E7E] text-white flex items-center justify-center text-xl font-semibold z-10 shadow">3</div>
+                        <div class="ml-6 sm:ml-8 flex-grow phase-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-200">
+                            <h3 class="text-xl font-semibold text-[#0A2463] mb-2">Phase 3: Game-Situation Evaluation (Camp Days 2-3)</h3>
+                            <div class="text-slate-700 text-sm">
+                                <p class="mb-2">This is a crucial phase where tactical understanding and game application are assessed:</p>
+                                <ul class="space-y-1 text-sm custom-list">
+                                    <li><strong class="text-[#3E8E7E]">Scrimmages/Exhibition Games:</strong> Assess tactical understanding, game application of skills, hockey IQ, and performance under game-like pressure. Evaluate "Hockey Sense" (General, Defensive, Offensive Awareness) and "Team Canada Identity" traits. Game evaluation forms and video recording are used.</li>
+                                    <li><strong class="text-[#3E8E7E]">Bench Management Observation:</strong> How players interact on the bench, respond to coaching, and support teammates.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="phase-item relative flex items-start">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-[#3E8E7E] text-white flex items-center justify-center text-xl font-semibold z-10 shadow">4</div>
+                        <div class="ml-6 sm:ml-8 flex-grow phase-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-200">
+                            <h3 class="text-xl font-semibold text-[#0A2463] mb-2">Phase 4: Off-Ice Evaluation & Interviews</h3>
+                            <div class="text-slate-700 text-sm">
+                                <p class="mb-2">Evaluation extends beyond the rink, integrated throughout and post-camp:</p>
+                                <ul class="space-y-1 text-sm custom-list">
+                                    <li><strong class="text-[#3E8E7E]">Physical Testing:</strong> (As appropriate for age/level) Tests for speed, agility, power, endurance (sprints, jumps, beep test). Standardized recording sheets used.</li>
+                                    <li><strong class="text-[#3E8E7E]">Mental Performance Assessment:</strong> Observe resilience, response to adversity, focus, and coachability. Consider short questionnaires or informal interviews.</li>
+                                    <li><strong class="text-[#3E8E7E]">Character & Leadership Assessment:</strong> Observe interactions, respect, and leadership potential. Coach observations and interview questions are key.</li>
+                                    <li><strong class="text-[#3E8E7E]">Player Interviews (shortlisted candidates):</strong> Discuss goals, understanding of team expectations, and coachability.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="phase-item relative flex items-start"> 
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-[#3E8E7E] text-white flex items-center justify-center text-xl font-semibold z-10 shadow">5</div>
+                        <div class="ml-6 sm:ml-8 flex-grow phase-card bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-200">
+                            <h3 class="text-xl font-semibold text-[#0A2463] mb-2">Phase 5: Final Evaluation & Roster Selection</h3>
+                            <div class="text-slate-700 text-sm">
+                                <p class="mb-2">The culmination of the tryout process:</p>
+                                <ul class="space-y-1 text-sm custom-list">
+                                    <li><strong class="text-[#3E8E7E]">Evaluation Meetings:</strong> Coaching staff and evaluators meet to discuss all collected data, comparing notes and ranking players.</li>
+                                    <li><strong class="text-[#3E8E7E]">Consideration of Team Composition:</strong> Balance of positions, player roles, and overall team chemistry.</li>
+                                    <li><strong class="text-[#3E8E7E]">Difficult Decisions:</strong> Acknowledge that some cuts will be tough, focusing on the overall best fit for the team's goals.</li>
+                                    <li><strong class="text-[#3E8E7E]">Player Feedback:</strong> Provide constructive feedback to all players, especially those not selected, offering guidance for future development (crucial for LTPD).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="evaluation-tools" class="py-10 md:py-16 scroll-mt-20 bg-slate-100 rounded-lg p-4 sm:p-6 md:p-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-[#0A2463] mb-4 text-center">Evaluation Tools</h2>
+            <p class="text-center text-slate-700 text-base md:text-lg max-w-3xl mx-auto mb-12">A combination of subjective (observational) and objective (measurable) tools are employed to create a well-rounded profile of each athlete. Tools are chosen based on the age and competitive level of the group, ensuring a multifaceted evaluation.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-semibold text-[#0A2463] mb-4 text-center">🏒 On-Ice Tools</h3>
+                    <ul class="space-y-3 text-sm text-slate-700 custom-list">
+                        <li><strong class="text-[#3E8E7E]">Hockey Canada Player Assessment Drills & Plans:</strong> Standardized drills for assessing specific technical skills (skating, puck control, shooting, passing, defense) and basic tactical elements. Tracked with evaluation sheets (e.g., 1-4 rating scale).</li>
+                        <li><strong class="text-[#3E8E7E]">Small Area Games (SAGs):</strong> Evaluate skill application, decision-making, competitiveness, and hockey sense in confined, game-like situations. Tracked via observational notes and video.</li>
+                        <li><strong class="text-[#3E8E7E]">Scrimmages/Exhibition Games:</strong> Assess overall game performance, tactical understanding, consistency, and response to game pressure. Tracked with individual player forms, video analysis (Hudl, Sportscode), and basic/advanced stats.</li>
+                        <li><strong class="text-[#3E8E7E]">Goaltender-Specific Drills:</strong> Evaluate save selection, rebound control, positioning, tracking, and puck handling. Tracked via goalie coach observations and video.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                    <h3 class="text-2xl font-semibold text-[#0A2463] mb-4 text-center">🏋️ Off-Ice Tools</h3>
+                    <ul class="space-y-3 text-sm text-slate-700 custom-list">
+                        <li><strong class="text-[#3E8E7E]">Physical Fitness Testing:</strong> Measure aerobic/anaerobic capacity, power, strength, agility (e.g., Beep Test, sprints, jumps). Tracked with standardized recording sheets. Professional teams use force plates, laser timing.</li>
+                        <li><strong class="text-[#3E8E7E]">Mental Performance & Psychological Assessments:</strong> Gauge mental toughness, coachability, motivation via interviews, questionnaires (e.g., ACSI, TOPS at elite levels), and behavioral observation.</li>
+                        <li><strong class="text-[#3E8E7E]">Character & Leadership Evaluation:</strong> Assess teamwork, communication, respect via coach/peer observations, references, and scenario-based interview questions.</li>
+                        <li><strong class="text-[#3E8E7E]">Academic Performance (Student-Athletes):</strong> Ensure eligibility and assess responsibility. Tracked via school transcripts.</li>
+                        <li><strong class="text-[#3E8E7E]">Medical History & Physical Examination:</strong> Ensure health and identify pre-existing conditions. Tracked via medical clearance forms.</li>
+                        <li><strong class="text-[#3E8E7E]">Advanced Tools:</strong> Advanced video platforms (XOS, Catapult), player tracking (NHL EDGE), biometric wearables (Firstbeat, Whoop), sophisticated scouting databases, psychometric testing services.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="in-season-plan" class="py-10 md:py-16 scroll-mt-20">
+            <h2 class="text-3xl sm:text-4xl font-bold text-[#0A2463] mb-4 text-center">In-Season Evaluation Plan</h2>
+            <p class="text-center text-slate-700 text-base md:text-lg max-w-3xl mx-auto mb-12">In-season evaluation is an ongoing process crucial for player development, providing feedback, and making informed coaching decisions. It should be integrated into the daily, weekly, and monthly team rhythm across four key pillars.</p>
+            <div>
+                <div class="mb-6 border-b border-slate-200 flex justify-center">
+                    <div id="in-season-tabs" class="flex flex-wrap justify-center space-x-1 sm:space-x-2" role="tablist">
+                        <button role="tab" aria-selected="true" aria-controls="technical-content" class="tab-button active" data-tab="technical-content">Technical</button>
+                        <button role="tab" aria-selected="false" aria-controls="tactical-content" class="tab-button" data-tab="tactical-content">Tactical</button>
+                        <button role="tab" aria-selected="false" aria-controls="physical-content" class="tab-button" data-tab="physical-content">Physical</button>
+                        <button role="tab" aria-selected="false" aria-controls="mental-content" class="tab-button" data-tab="mental-content">Mental</button>
+                    </div>
+                </div>
+                <div id="in-season-tab-content" class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 min-h-[280px] sm:min-h-[240px]">
+                    <div id="technical-content" role="tabpanel" class="tab-pane">
+                        <h4 class="text-xl font-semibold text-[#0A2463] mb-3">Technical Pillar (Skill Execution & Refinement)</h4>
+                        <p class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Focus:</strong> Assessing the quality and consistency of fundamental skills (skating, puck skills, passing, shooting, checking) in practice and game situations. Identifying areas for improvement based on Hockey Canada's "Skill Deficiencies" and "Skill Strengths."</p>
+                        <div class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Methods:</strong> 
+                            <ul class="space-y-1 text-sm custom-list mt-1">
+                                <li>Practice Observation: Assess drill performance, repetition quality (deliberate practice), provide immediate, specific feedback.</li>
+                                <li>Video Analysis (Individual Clips): Show players clips of their technique, compare to models or past bests, use telestration.</li>
+                                <li>Skill-Specific Testing/Challenges: Occasional focused assessment of progress (e.g., shooting accuracy, skating times).</li>
+                            </ul>
+                        </div>
+                        <p class="text-sm text-slate-700"><strong class="text-[#3E8E7E]">Frequency:</strong> Daily (practice observation), Weekly (video review sessions).</p>
+                    </div>
+                    <div id="tactical-content" role="tabpanel" class="tab-pane hidden">
+                        <h4 class="text-xl font-semibold text-[#0A2463] mb-3">Tactical Pillar (Hockey Sense & System Play)</h4>
+                        <p class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Focus:</strong> Assessing decision-making, understanding and execution of team systems (breakouts, D-zone coverage), positional play, and overall hockey IQ, including "Athlete Expectations" (General, Defensive, Offensive Awareness).</p>
+                        <div class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Methods:</strong> 
+                            <ul class="space-y-1 text-sm custom-list mt-1">
+                                <li>Game Observation & Analysis: Live tracking with "Game Card," video review (team, positional, individual) to discuss system execution and "Canadian Way Principles."</li>
+                                <li>Practice Scenarios & SAGs: Replicate game situations to assess tactical understanding.</li>
+                                <li>"Chalk Talks" / Whiteboard Sessions: Discuss concepts and allow players to demonstrate understanding.</li>
+                            </ul>
+                        </div>
+                        <p class="text-sm text-slate-700"><strong class="text-[#3E8E7E]">Frequency:</strong> Post-game (video review), Weekly (tactical focus in practices and meetings).</p>
+                    </div>
+                    <div id="physical-content" role="tabpanel" class="tab-pane hidden">
+                        <h4 class="text-xl font-semibold text-[#0A2463] mb-3">Physical Pillar (Conditioning, Strength, Durability)</h4>
+                        <p class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Focus:</strong> Monitoring fitness levels, recovery, injury prevention, ensuring players meet physical demands. Links to "S&C HP1 Coaching Presentation."</p>
+                        <div class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Methods:</strong> 
+                            <ul class="space-y-1 text-sm custom-list mt-1">
+                                <li>Observation in Practice & Games: Energy levels, pace maintenance, physicality.</li>
+                                <li>Communication with S&C Coach: Regular updates on team's physical state, training load.</li>
+                                <li>Periodic Fitness Re-testing: Mid-season, pre-playoffs to track progress.</li>
+                                <li>Monitoring Training Load: Using RPE or tools to prevent overtraining.</li>
+                                <li>Injury Tracking & Management: Close work with athletic therapists.</li>
+                            </ul>
+                        </div>
+                        <p class="text-sm text-slate-700"><strong class="text-[#3E8E7E]">Frequency:</strong> Daily (observation), Weekly (S&C sessions, S&C coach communication), Periodically (fitness testing).</p>
+                    </div>
+                    <div id="mental-content" role="tabpanel" class="tab-pane hidden">
+                        <h4 class="text-xl font-semibold text-[#0A2463] mb-3">Mental Pillar (Mindset, Focus, Resilience)</h4>
+                        <p class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Focus:</strong> Assessing psychological skills: confidence, concentration, emotional control, resilience, motivation, coachability. Crucial for "Gen Z athletes."</p>
+                        <div class="text-sm text-slate-700 mb-1"><strong class="text-[#3E8E7E]">Methods:</strong> 
+                            <ul class="space-y-1 text-sm custom-list mt-1">
+                                <li>Behavioral Observation: Response to mistakes/pressure, effort, body language, coachability.</li>
+                                <li>Individual Meetings & Check-ins: Regular conversations to understand players' mental state and challenges, building "Connection."</li>
+                                <li>Goal Setting & Review: Work with players on SMART goals and review progress (process, performance, outcome).</li>
+                                <li>Encouraging Mental Skills Practice: Introduce visualization, positive self-talk, "mental anchor" breathing.</li>
+                                <li>Creating a Supportive Environment: Foster a culture of trust and psychological safety.</li>
+                            </ul>
+                        </div>
+                        <p class="text-sm text-slate-700"><strong class="text-[#3E8E7E]">Frequency:</strong> Daily (observation, informal check-ins), Weekly/Bi-weekly (individual meetings).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="progress-tracking" class="py-10 md:py-16 scroll-mt-20 bg-slate-100 rounded-lg p-4 sm:p-6 md:p-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-[#0A2463] mb-4 text-center">In-Season Progress Tracking</h2>
+            <p class="text-center text-slate-700 text-base md:text-lg max-w-3xl mx-auto mb-12">Tracking progress is essential to ensure development, provide players with tangible evidence of growth, and adjust training plans. The Self-Evaluation Radar is a powerful tool for players and coaches to visualize progress.</p>
+            
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-12 border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-center items-center mb-6 gap-3">
+                    <label for="player-profile-select" class="font-semibold text-slate-700 text-sm sm:text-base">View Player Profile Example:</label>
+                    <select id="player-profile-select" class="p-2 border border-slate-300 rounded-md shadow-sm focus:ring-2 focus:ring-[#3E8E7E] focus:border-[#3E8E7E] text-sm">
+                        <option value="playmaker">Balanced Playmaker</option>
+                        <option value="defender">Gritty Defender</option>
+                        <option value="developing">Developing Forward</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="interactivePlayerRadarChart"></canvas>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold text-[#0A2463] mb-6 text-center">Key Tracking Tool Categories</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200 min-h-[160px]">
+                        <h4 class="font-semibold text-lg text-[#F4A261] mb-2">Technical Tools</h4>
+                        <p class="text-sm text-slate-700">Video analysis (side-by-side technique comparison), skill-specific charts/checklists (based on Hockey Canada assessment points, re-assessed monthly), and drill performance metrics (e.g., agility skating times, shooting accuracy percentages).</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200 min-h-[160px]">
+                        <h4 class="font-semibold text-lg text-[#F4A261] mb-2">Tactical Tools</h4>
+                        <p class="text-sm text-slate-700">Game statistics (basic: G, A, +/; advanced via video: zone entries/exits, pass completion %, TO/TA), video review with tagging of tactical decisions/system execution, positional feedback forms, player self-reflection worksheets on tactical understanding.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200 min-h-[160px]">
+                        <h4 class="font-semibold text-lg text-[#F4A261] mb-2">Physical Tools</h4>
+                        <p class="text-sm text-slate-700">Fitness testing results (baseline and periodic re-tests), strength & conditioning logs (workout completion, weights lifted), wellness monitoring (daily questionnaires on sleep, soreness, mood), and athletic therapist injury logs.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200 min-h-[160px]">
+                        <h4 class="font-semibold text-lg text-[#F4A261] mb-2">Mental Tools</h4>
+                        <p class="text-sm text-slate-700">Player journals/self-reflection prompts (goals, challenges, mental state), SMART goal worksheets with periodic reviews, coach's behavioral observation notes (response to adversity, feedback consistency), and anonymous team cohesion surveys.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#0A2463] text-white mt-12">
+        <div class="container mx-auto px-4 py-6 text-center text-xs sm:text-sm">
+            <p>&copy; 2025 - Carlee Campbell HP1 Post Task - Player Evaluation & Selection (Section B Question 3).</p>
+            <p>This is a conceptual representation for certification purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        const menuButton = document.getElementById('menu-btn');
+        const mobileMenuElement = document.getElementById('mobile-menu');
+        menuButton.addEventListener('click', () => {
+            mobileMenuElement.classList.toggle('hidden');
+        });
+
+        function setupTabs(tabContainerId, contentContainerId) {
+            const tabs = document.querySelectorAll(`#${tabContainerId} [role="tab"]`);
+            const tabPanes = document.querySelectorAll(`#${contentContainerId} [role="tabpanel"]`);
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => {
+                        t.setAttribute('aria-selected', 'false');
+                        t.classList.remove('active', 'text-[#3E8E7E]', 'border-[#3E8E7E]');
+                        t.classList.add('text-slate-600', 'border-transparent');
+                    });
+                    tab.setAttribute('aria-selected', 'true');
+                    tab.classList.add('active', 'text-[#3E8E7E]', 'border-[#3E8E7E]');
+                    tab.classList.remove('text-slate-600', 'border-transparent');
+                    
+                    tabPanes.forEach(pane => {
+                        if (pane.id === targetId) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+             if (tabs.length > 0) {
+                tabs[0].click();
+            }
+        }
+
+        setupTabs('in-season-tabs', 'in-season-tab-content');
+
+        const radarChartDataStore = {
+            labelsAndTooltips: [
+                {label: ['Resilience'], id: 'resilience'},
+                {label: ['Compete', 'Level'], id: 'competeLevel'},
+                {label: ['Consistency'], id: 'consistency'},
+                {label: ['Confidence'], id: 'confidence'},
+                {label: ['Composure'], id: 'composure'},
+                {label: ['Coachability'], id: 'coachability'},
+                {label: ['Puck', 'Skills', '(Technical)'], id: 'puckSkills'},
+                {label: ['Skating', '(Technical)'], id: 'skating'},
+                {label: ['Shooting', '(Technical)'], id: 'shooting'},
+                {label: ['Strength', '(Physical)'], id: 'strength'},
+                {label: ['Speed', '(Physical)'], id: 'speed'},
+                {label: ['Hockey IQ', '(Tactical)'], id: 'hockeyIQ'},
+                {label: ['System Play', '(Tactical)'], id: 'systemPlay'},
+                {label: ['Motivation', '(Mental)'], id: 'motivation'}
+            ],
+            profiles: {
+                playmaker: {
+                    name: 'Balanced Playmaker (Example)',
+                    data: [8, 9, 7, 8, 8, 9, 9, 8, 7, 6, 7, 9, 8, 8] 
+                },
+                defender: {
+                    name: 'Gritty Defender (Example)',
+                    data: [9, 10, 8, 7, 7, 8, 6, 7, 5, 9, 6, 7, 9, 9]
+                },
+                developing: {
+                    name: 'Developing Forward (Example)',
+                    data: [6, 7, 5, 5, 6, 7, 7, 6, 7, 5, 8, 6, 5, 6]
+                }
+            }
+        };
+        
+        const chartLabels = radarChartDataStore.labelsAndTooltips.map(item => {
+            const labelText = item.label.join(' ');
+            if (labelText.length > 16) {
+                let lines = [];
+                let currentLine = '';
+                const words = labelText.split(' ');
+                words.forEach(word => {
+                    if ((currentLine + word).length > 16 && currentLine.length > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                });
+                lines.push(currentLine.trim());
+                return lines;
+            }
+            return labelText;
+        });
+
+        const radarCtxInteractive = document.getElementById('interactivePlayerRadarChart').getContext('2d');
+        let interactivePlayerRadar;
+
+        function createOrUpdateInteractiveRadar(profileKey) {
+            const profileData = radarChartDataStore.profiles[profileKey];
+            if (!profileData) return;
+
+            const dataForChart = {
+                labels: chartLabels,
+                datasets: [{
+                    label: profileData.name,
+                    data: profileData.data,
+                    fill: true,
+                    backgroundColor: 'rgba(62, 142, 126, 0.2)', 
+                    borderColor: '#3E8E7E',      
+                    pointBackgroundColor: '#3E8E7E',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#3E8E7E',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: dataForChart,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(100, 116, 139, 0.2)' }, 
+                            grid: { color: 'rgba(100, 116, 139, 0.2)' },
+                            pointLabels: { 
+                                font: { size: 9, weight: '500', family: 'Inter' },
+                                color: '#475569' 
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 10,
+                                stepSize: 2,
+                                backdropColor: 'rgba(253, 253, 253, 0.6)',
+                                color: '#64748B', 
+                                font: {size: 10, family: 'Inter'}
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                font: { size: 12, weight: '600', family: 'Inter' },
+                                color: '#0A2463' 
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 36, 99, 0.9)', 
+                            titleFont: { size: 12, weight: 'bold', family: 'Inter' },
+                            bodyFont: { size: 11, family: 'Inter' },
+                            padding: 10,
+                            cornerRadius: 4,
+                            boxPadding: 3,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = radarChartDataStore.labelsAndTooltips[item.dataIndex].label.join(' ');
+                                    return label;
+                                },
+                                label: function(context) {
+                                    return `Score: ${context.parsed.r}`;
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderWidth: 2.5
+                        }
+                    }
+                }
+            };
+            
+            if (interactivePlayerRadar) {
+                interactivePlayerRadar.data = dataForChart;
+                interactivePlayerRadar.update();
+            } else {
+                interactivePlayerRadar = new Chart(radarCtxInteractive, config);
+            }
+        }
+        
+        const playerProfileSelect = document.getElementById('player-profile-select');
+        playerProfileSelect.addEventListener('change', (event) => {
+            createOrUpdateInteractiveRadar(event.target.value);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('interactivePlayerRadarChart')) {
+                 createOrUpdateInteractiveRadar('playmaker');
+            }
+           
+            const navLinks = document.querySelectorAll('header nav a');
+            const mobileNavLinks = document.querySelectorAll('#mobile-menu a');
+            const allLinks = [...navLinks, ...mobileNavLinks];
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const navLink = document.querySelector(`header nav a[href="#${id}"]`);
+                    const mobileLink = document.querySelector(`#mobile-menu a[href="#${id}"]`);
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                        navLink?.classList.add('active');
+                        mobileLink?.classList.add('bg-[#3E8E7E]');
+                    } else {
+                        navLink?.classList.remove('active');
+                        mobileLink?.classList.remove('bg-[#3E8E7E]');
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px", threshold: [0.4, 0.6] });
+
+            document.querySelectorAll('main section[id]').forEach(section => {
+                observer.observe(section);
+            });
+            
+            allLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (mobileMenuElement.contains(link)) {
+                         mobileMenuElement.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
+
